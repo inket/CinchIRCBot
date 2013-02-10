@@ -22,7 +22,7 @@ CHAN = "#----"
 LOG_LINK = ""
 
 bot = Cinch::Bot.new do
-	configure do |c|
+  configure do |c|
 	  c.server = SERVER
 	  c.nick = NICK
 	  c.channels = [CHAN]
@@ -82,23 +82,23 @@ bot = Cinch::Bot.new do
 		  result = nil
 			
 		  begin
-				Net::HTTP.start(domain) do |http|
-					req = Net::HTTP::Head.new(uri)
-					req["User-Agent"] = USER_AGENT
-					headers = http.request(req).to_hash
-					content_length = headers["content-length"].first.to_i
-					location = headers["location"] || link
+			  Net::HTTP.start(domain) do |http|
+				  req = Net::HTTP::Head.new(uri)
+				  req["User-Agent"] = USER_AGENT
+				  headers = http.request(req).to_hash
+				  content_length = headers["content-length"].first.to_i
+				  location = headers["location"] || link
 					
-					if (content_length <= 512000) # 500KB
-						req = Net::HTTP::Get.new(uri)
-						req["User-Agent"] = USER_AGENT
-						result = http.request(req).body
-						result = result.scan(/<title.*?>(.*?)<\/title>/im).flatten.first
-					end
-				end
+				  if (content_length <= 512000) # 500KB
+					  req = Net::HTTP::Get.new(uri)
+					  req["User-Agent"] = USER_AGENT
+					  result = http.request(req).body
+					  result = result.scan(/<title.*?>(.*?)<\/title>/im).flatten.first
+				  end
+			  end
 		  rescue StandardError => e
-				puts e.to_s
-				throw :dropit
+			  puts e.to_s
+			  throw :dropit
 		  end
 			
 		  nil || result
