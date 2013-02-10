@@ -22,10 +22,10 @@ CHAN = "#----"
 LOG_LINK = ""
 
 bot = Cinch::Bot.new do
-  configure do |c|
-		c.server = SERVER
-		c.nick = NICK
-		c.channels = [CHAN]
+	configure do |c|
+	  c.server = SERVER
+	  c.nick = NICK
+	  c.channels = [CHAN]
   end
   
   on :message, TWITTER_LINK_REGEXP do |m|
@@ -37,51 +37,51 @@ bot = Cinch::Bot.new do
 	  
 	  begin
 		  response = open("http://api.twitter.com/1/statuses/show/#{status_num}.json").read.to_s
-	  	result = JSON.parse(response)
+		  result = JSON.parse(response)
 	  rescue StandardError => e
 		  puts e.to_s
-		end
+	  end
 	  
 	  if (!result.nil? && (result["user"])["screen_name"].downcase == screen_name.downcase)
-			m.reply("Tweet by @#{(result["user"])["screen_name"]}: \"#{result["text"]}\"")
-		end
+		  m.reply("Tweet by @#{(result["user"])["screen_name"]}: \"#{result["text"]}\"")
+	  end
   end
   
   on :message, YOUTUBE_LINK_REGEXP do |m|
-  	link = m.params.last.scan(YOUTUBE_LINK_REGEXP).flatten.first
-  	vid_id = link.scan(YOUTUBE_VID_ID_REGEXP).flatten.first
+	  link = m.params.last.scan(YOUTUBE_LINK_REGEXP).flatten.first
+	  vid_id = link.scan(YOUTUBE_VID_ID_REGEXP).flatten.first
   	
-		title = nil
-		user = nil
+	  title = nil
+	  user = nil
 		  
-  	begin
-  		response = open("https://gdata.youtube.com/feeds/api/videos/#{vid_id}?v=2&alt=jsonc").read.to_s
-  		result = JSON.parse(response)
-  		title = (result["data"])["title"]
-  		user = (result["data"])["uploader"]
-  	rescue StandardError => e
-  		puts e.to_s
-  	end
+	  begin
+		  response = open("https://gdata.youtube.com/feeds/api/videos/#{vid_id}?v=2&alt=jsonc").read.to_s
+		  result = JSON.parse(response)
+		  title = (result["data"])["title"]
+		  user = (result["data"])["uploader"]
+	  rescue StandardError => e
+		  puts e.to_s
+	  end
   
-  	m.reply("YouTube: \"#{title}\" by #{user}") unless title.nil? || user.nil?
+	  m.reply("YouTube: \"#{title}\" by #{user}") unless title.nil? || user.nil?
   end
   
   on :message, /^\!\s/ do |m|
 	  title = catch(:dropit) {
-			link = m.params.last.scan(LINK_REGEXP).flatten.first
-			throw(:dropit) if link.nil? || link.empty?
+		  link = m.params.last.scan(LINK_REGEXP).flatten.first
+		  throw(:dropit) if link.nil? || link.empty?
 			
-			domain = link.scan(DOMAIN_REGEXP).flatten.first
-			throw(:dropit) if domain.nil? || domain.empty?
+		  domain = link.scan(DOMAIN_REGEXP).flatten.first
+		  throw(:dropit) if domain.nil? || domain.empty?
 			
-			uri = link.scan(URI_REGEXP).flatten.first
-			if (uri.nil? || !link.end_with?(domain+uri))
-				throw :dropit
-			end
-			uri = "/"+uri unless uri.start_with?("/")
-			result = nil
+		  uri = link.scan(URI_REGEXP).flatten.first
+		  if (uri.nil? || !link.end_with?(domain+uri))
+			  throw :dropit
+		  end
+		  uri = "/"+uri unless uri.start_with?("/")
+		  result = nil
 			
-			begin
+		  begin
 				Net::HTTP.start(domain) do |http|
 					req = Net::HTTP::Head.new(uri)
 					req["User-Agent"] = USER_AGENT
@@ -96,26 +96,26 @@ bot = Cinch::Bot.new do
 						result = result.scan(/<title.*?>(.*?)<\/title>/im).flatten.first
 					end
 				end
-			rescue StandardError => e
+		  rescue StandardError => e
 				puts e.to_s
 				throw :dropit
-			end
+		  end
 			
-			nil || result
+		  nil || result
 	  }
 		
 		if (!title.nil?)
-			m.reply "Link: #{title}"
+		  m.reply "Link: #{title}"
 		end
-	end
+  end
 	
   on :message, /#{NICK}/ do |m|
 	  m.reply ":)"
-	end
+  end
 	
-	on :message, "!log" do |m|
-		m.reply "Here's the channel's IRC log: #{LOG_LINK}"
-	end
+  on :message, "!log" do |m|
+	  m.reply "Here's the channel's IRC log: #{LOG_LINK}"
+  end
 end
 
 bot.start
