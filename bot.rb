@@ -104,9 +104,9 @@ bot = Cinch::Bot.new do
 		  nil || result
 	  }
 		
-		if (!title.nil?)
+	  if (!title.nil?)
 		  m.reply "Link: #{title}"
-		end
+	  end
   end
 	
   on :message, /#{NICK}/ do |m|
